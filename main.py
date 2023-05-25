@@ -117,8 +117,28 @@ plt.ylabel("y axis")
 plt.xlabel("x axis")
 plt.show()
 
-sns.heatmap(A, cmap="Spectral", annot=True)
-plt.title("Тепловая карта")
-plt.ylabel("Номер строки")
+# Построение тепловой карты
+fig, ax = plt.subplots()
+im = ax.imshow(A, cmap='coolwarm')
+
+# Добавление подписей для осей
+ax.set_xticks(range(n))
+ax.set_yticks(range(n))
+ax.set_xticklabels(range(1, n+1))
+ax.set_yticklabels(range(1, n+1))
 plt.xlabel("Номер столбца")
+plt.ylabel("Номер строки")
+
+# Добавление аннотаций в ячейки
+for i in range(n):
+    for j in range(n):
+        text = ax.text(j, i, A[i, j], ha="center", va="center", color="black")
+
+# Добавление цветовой шкалы
+cbar = ax.figure.colorbar(im, ax=ax)
+cbar.ax.set_ylabel("Значение", rotation=-90, va="bottom")
+
+# Добавление заголовка
+plt.title("Тепловая карта матрицы A")
+
 plt.show()

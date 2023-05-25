@@ -1,14 +1,59 @@
 import seaborn as sns
 from matplotlib import pyplot as plt
 import numpy as np
+def calculate_expression(A, F, k):
+    trans_A = np.transpose(A)
+    trans_F = np.transpose(F)
+    det_A = np.linalg.det(A)
+    diag_F = np.trace(F)
 
+    if det_A > diag_F:
+        print('Вычисляем выражение : A-1*AT – K * F-1 ')
+        print('Транспонированая матрица A:\n', trans_A)
+
+        power_A = np.linalg.matrix_power(A, -1)
+        print('Возведение матрицы A в -1 степень:\n', power_A)
+
+        mod_A = np.dot(A, trans_A)
+        print('Умножение A-1 * AT\n', mod_A)
+
+        power_F = np.linalg.matrix_power(F, -1)
+        print('Возведение матрицы F в -1 степень:\n', power_F)
+
+        mod_power_F = np.dot(k, power_F)
+        print('Умножение K *F-1\n', mod_power_F)
+
+        result = np.subtract(mod_A, mod_power_F)
+        print('Разница матриц\n', result)
+    else:
+        print('Вычисляем выражение: (AТ + G-FТ)*K ')
+        print('Транспонированая матрица F:\n', trans_F)
+
+        G = np.tril(A)
+        print('Нижняя треугольная матрица G из матрицы A:\n', G)
+
+        pAG = np.subtract(trans_F, G)
+        print('Разница A-1 - G:\n', pAG)
+
+        print('Транспонированая матрица A:\n', trans_A)
+
+        pAGFT = np.subtract(pAG, trans_F)
+        print('Разница At + G - FT:\n', pAGFT)
+
+        result = np.dot(pAGFT, k)
+        print('Умножение на K\n', result)
+
+    print('Результат вычислений\n', result)
+    return result
 
 k = int(input("Введите число K  которое является коэффициентом при умножении: "))
-n = int(input("Введите размерность матрицы A: "))
-while n <= 3:
+n = int(input("Введите размерность матрицы A(чётное): "))
+while n <= 3 or n % 2 != 0:
     n = int(input("Введите число больше 3: "))
-
-A = np.arange(1, n**2+1).reshape(n, n)
+A = np.zeros((n, n))
+for i in range(n):
+    for j in range(i, n):
+        A[i][j] = A[j][i] = np.random.randint(-10, 11)
 print("Матрица A:\n", A)
 
 half_n = n // 2
@@ -32,64 +77,23 @@ print("Подматрица C:\n", C)
 
 if np.array_equal(A, A.T):
     print("Матрица A симметрична относительно главной диагонали")
-    temp = np.copy(C)
-    C = np.copy(B)
+    temp = np.fliplr(C)
+    C = np.fliplr(B)
     B = np.copy(temp)
+    print("Подматрица B после замены:\n", B)
+    print("Подматрица C после замены:\n", C)
 else:
     print("Матрица A не симметрична относительно главной диагонали")
     temp = np.copy(C)
     C = np.copy(E)
     E = np.copy(temp)
-
-print("Подматрица B после замены:\n", B)
-print("Подматрица C после замены:\n", C)
-print("Подматрица E после замены:\n", E)
+    print("Подматрица C после замены:\n", C)
+    print("Подматрица E после замены:\n", E)
 
 F = np.vstack((np.hstack((D, E)), np.hstack((C, B))))
 print("Матрица F:\n", F)
-trans_A = np.transpose(A)
-trans_F = np.transpose(F)
-det_A = np.linalg.det(A)
-diag_F = np.trace(F)
 
-if det_A > diag_F:
-    print('Вычисляем выражение : A-1*AT – K * F-1 ')
-    print('Транспонированая матрица A:\n', trans_A)
-
-    power_A = np.linalg.matrix_power(A, -1)
-    print('Возведение матрицы A в -1 степень:\n', power_A)
-
-    mod_A = np.dot(A, trans_A)
-    print('Умножение A-1 * AT\n', mod_A)
-
-    power_F = np.linalg.matrix_power(F, -1)
-    print('Возведение матрицы F в -1 степень:\n', power_F)
-
-    mod_power_F = np.dot(k, power_F)
-    print('Умножение K *F-1\n', mod_power_F)
-
-    result = np.subtract(mod_A, mod_power_F)
-    print('Разница матриц\n', result)
-else:
-    print('Вычисляем выражение: (AТ + G-FТ)*K ')
-    print('Транспонированая матрица F:\n', trans_F)
-
-    G = np.tril(A)
-    print('Нижняя треугольная матрица G из матрицы A:\n', G)
-
-    pAG = np.subtract(trans_F, G)
-    print('Разница A-1 - G:\n', pAG)
-
-    print('Транспонированая матрица A:\n', trans_A)
-
-    pAGFT = np.subtract(pAG, trans_F)
-    print('Разница At + G - FT:\n', pAGFT)
-
-    result = np.dot(pAGFT, k)
-    print('Умножение на K\n', result)
-
-print('Результат вычислений\n', result)
-
+print(calculate_expression(A, F, k))
 
 explode = [0] * (n - 1)
 explode.append(0.1)
